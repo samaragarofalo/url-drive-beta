@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 
 def define_upload_path(instance, file_name):
-    return os.path.join(instance.file_path, f'v{instance.version}_{file_name}')
+    return os.path.join(instance.file_path.url_path, f'v{instance.version}_{file_name}')
 
 
 class UrlManagement(models.Model):
@@ -23,7 +23,7 @@ class UrlManagement(models.Model):
 
 
 class File(models.Model):
-    file_attachment = models.FilePathField(path="C:/TEMP", blank=True, null=True, verbose_name='File')
+    file_attachment = models.FileField(upload_to=define_upload_path, blank=True, null=True, verbose_name='File')
     file = models.TextField(blank=True, null=True, verbose_name='Criptografed File')
     file_name = models.CharField(max_length=150, db_index=True, verbose_name='File Name')
     file_path = models.ForeignKey(UrlManagement, on_delete=models.CASCADE, verbose_name='File Path')
@@ -40,4 +40,3 @@ class File(models.Model):
         db_table = "file"
         verbose_name = "File"
         verbose_name_plural = "Files"
-        unique_together = ('file_path', 'version')

