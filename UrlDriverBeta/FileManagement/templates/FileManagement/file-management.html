@@ -1,0 +1,29 @@
+{% extends 'header.html' %}
+{% load static %}
+
+{% block title %}
+    <title>File Management - URL Driver</title>
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container mt-2">
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Insert URL</label>
+            <input type="text" class="form-control" id="new_url" placeholder="name@example.com" name="new_url">
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Choose from an existing URL</label>
+            <select class="form-select form-select-sm" aria-label="Existing URL" id="url" name="url">
+                {% for url in urls %}
+                    <option value="{{url.0}}">{{url.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Choose file to be uploaded</label>
+            <input class="form-control" type="file" id="file" name="file">
+        </div>
+    </div>
+</body>
+{% endblock %}
