@@ -1,5 +1,7 @@
+import io
 import os.path
 import traceback
+import mimetypes
 
 from django.db.models import QuerySet
 from django.http import HttpResponse, JsonResponse, Http404, FileResponse
@@ -27,9 +29,7 @@ def file_upload(request):
             return JsonResponse({"error": "No file uploaded."}, status=400)
 
         response = dict(request.POST)
-        file_response = dict()
-        for k, v in response.items():
-            file_response[k] = v[0]
+        file_response = {k: v[0] for k, v in response.items()}
 
         type_of_url, create_or_get = ('create', 'new_url') if file_response['new_url'] else ('filter', 'url')
 
@@ -57,31 +57,36 @@ def file_upload(request):
     return JsonResponse({
         'message': "Your file was uploaded successfully!",
         'file_id': new_file.id,
-        'file_url': new_file.file_attachment.url,
     })
 
 
 def file_download(request, file_path):
     try:
-        aux = dict(request.GET)
+        revision = {k: v[0] for k, v in request.GET.items()}
 
-        revision = dict()
-        for k, v in revision.items():
-            revision[k] = v[0]
+        file_name = file_path.rsplit('/', 1)[-1]
+        url = file_path.rsplit('/', 1)[0]
 
-        url_path = get_object_or_404(UrlManagement, url_path=file_path)
+        url_path = get_object_or_404(UrlManagement, url_path=url)
 
-        if revision:
-            file = get_object_or_404(File, file_path=url_path, version=int(revision['revision']))
+        if 'revision' in revision:
+            file = get_object_or_404(File, file_path=url_path, version=int(revision['revision']),
+                                     created_by=request.user)
         else:
             file = File.objects.filter(file_path=url_path, created_by=request.user).order_by('-version').first()
 
-        if not file:
+        if not file or not file.file_attachment:
             raise Http404("File not found")
 
-        file_full_path = os.path.join("C:/TEMP", file.file_name)
+        guessed_mime_type, _ = mimetypes.guess_file_type(file.file_name)
+        if not guessed_mime_type:
+            guessed_mime_type = "application/octet-stream"
 
-        return FileResponse(open(file_full_path, 'rb'), as_attachment=True, filename=file.file_name)
+        response = FileResponse(io.BytesIO(file.file_attachment), as_attachment=True)
+        response['Content-Disposition'] = f'attachment; filename="{file.file_name}"'
+        response['Content-Type'] = guessed_mime_type
+
+        return response
 
     except Exception as e:
         print(e)

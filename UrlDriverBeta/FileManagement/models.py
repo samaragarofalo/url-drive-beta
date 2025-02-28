@@ -23,8 +23,7 @@ class UrlManagement(models.Model):
 
 
 class File(models.Model):
-    file_attachment = models.FileField(upload_to=define_upload_path, blank=True, null=True, verbose_name='File')
-    file = models.TextField(blank=True, null=True, verbose_name='Criptografed File')
+    file_attachment = models.BinaryField(blank=True, null=True, verbose_name='File')
     file_name = models.CharField(max_length=150, db_index=True, verbose_name='File Name')
     file_path = models.ForeignKey(UrlManagement, on_delete=models.CASCADE, verbose_name='File Path')
     version = models.PositiveIntegerField(default=0, verbose_name='File Version')
