@@ -12,6 +12,13 @@
     <nav class="navbar navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="/">URL Driver</a>
+            {% if request.user.is_authenticated %}
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <h3>Hello, {{request.user.first_name}}</h3>
+                    <a href="{% url 'logout' %}">Log out</a>
+                </form>
+            {% endif %}
         </div>
     </nav>
 

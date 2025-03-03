@@ -7,10 +7,13 @@ from django.db.models import QuerySet
 from django.http import HttpResponse, JsonResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from .models import UrlManagement, File
 from .utils import upload_attachment
 
+
+@login_required(login_url="/login/")
 def file_upload_main(request):
     dic = dict()
 
@@ -19,6 +22,7 @@ def file_upload_main(request):
     return render(request,'FileManagement/file-management.html', dic)
 
 
+@login_required(login_url="/login/")
 @csrf_exempt
 def file_upload(request):
     try:
@@ -60,6 +64,7 @@ def file_upload(request):
     })
 
 
+@login_required(login_url="/login/")
 def file_download(request, file_path):
     try:
         revision = {k: v[0] for k, v in request.GET.items()}
